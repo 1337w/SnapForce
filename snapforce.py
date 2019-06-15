@@ -2,11 +2,7 @@ import sys
 import os
 import requests
 import random
-import time
-import json
-from lxml.html import fromstring
 from itertools import cycle
-import traceback
 import threading
 from queue import Queue
 import time
