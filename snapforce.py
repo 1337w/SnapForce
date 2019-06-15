@@ -109,3 +109,6 @@ start = time.time()
 for worker in range(len(password_list)) :
     q.put(worker)
 q.join()
+
+print("Nothing found!")
+quit()
